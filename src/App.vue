@@ -14,7 +14,10 @@ export default {
       fakeText: '',
       decryptedText: '',
       textCrypted: '',
-      classDecrypt: false
+      classDecrypt: false,
+      writePsw: '',
+      checkPsw: '',
+      submitted: false
     }
   },
   methods: {
@@ -24,9 +27,13 @@ export default {
     },
     changeClass() {
       this.show = true;
+      this.submitted = true;
     },
     validateInput() {
       this.inputFilled = this.input.trim() !== '';
+    },
+    validatePsw() {
+      this.show = this.writePsw.trim() !== '';
     },
     encrypt(data, password) {
       try {
@@ -44,11 +51,11 @@ export default {
         return null;
       }
     },
-    decrypt(textCrypted, psw) {
+    decrypt(textCrypted, writePsw) {
       try {
         const salt = CryptoJS.enc.Hex.parse(textCrypted.substring(0, 32));
         const encryptedData = textCrypted.substring(32);
-        const key = CryptoJS.PBKDF2(psw, salt, { keySize: 512 / 32, iterations: 1000 });
+        const key = CryptoJS.PBKDF2(writePsw, salt, { keySize: 512 / 32, iterations: 1000 });
         const decrypted = CryptoJS.AES.decrypt(encryptedData, key, { iv: salt });
         const decryptedText = decrypted.toString(CryptoJS.enc.Utf8);
 
@@ -64,8 +71,8 @@ export default {
       }
     },
     decryptMessage() {
-      if (this.textCrypted && this.psw) {
-        this.decryptedText = this.decrypt(this.textCrypted, this.psw);
+      if (this.textCrypted && this.writePsw) {
+        this.decryptedText = this.decrypt(this.textCrypted, this.writePsw);
       } else {
         console.error("Input or password is empty.");
       }
@@ -85,22 +92,28 @@ export default {
       </div>
       <div class="card-body">
         <div class="input-group xx input-group-sm mb-3 xx">
-          <span class="input-group-text span d-flex justify-content-center">Write</span>
+          <span class="input-group-text span white-header d-flex justify-content-center">Write</span>
           <textarea class="form-control input-text" aria-label="With textarea" placeholder="Write your message"
             v-model="input" @input="validateInput"></textarea>
         </div>
+        <div class="input-group xx input-group-sm mb-3 xx">
+          <span class="input-group-text span white-header d-flex justify-content-center">Password</span>
+          <textarea class="form-control input-text" :class="{ 'psw': show }" aria-label="With textarea"
+            placeholder="Write your message" v-model="writePsw" @input="validatePsw"></textarea>
+        </div>
         <div class="card-text">
-          <div class="result " :class="{ 'show': show && inputFilled, 'remove': !(show && inputFilled) }">
+          <div class="result "
+            :class="{ 'show': submitted && inputFilled && writePsw, 'remove': !(submitted && inputFilled && writePsw) }">
             <div class=" input-group input-group-sm mb-3 xx">
-              <span class="input-group-text span d-flex justify-content-center" id="inputGroup-sizing-sm">AES
+              <span class="input-group-text span ff d-flex justify-content-center" id="inputGroup-sizing-sm">AES
                 Encrypt</span>
               <div type="text" class="form-control input-text text-start" aria-label="Sizing example input"
                 aria-describedby="inputGroup-sizing-sm">
-                <p>{{ encrypt(input, psw) }}</p>
+                <p>{{ encrypt(input, writePsw) }}</p>
               </div>
             </div>
             <div class="input-group input-group-sm mb-3 xx">
-              <span class="input-group-text span d-flex justify-content-center" id="inputGroup-sizing-sm">SHA256</span>
+              <span class="input-group-text span ff d-flex justify-content-center" id="inputGroup-sizing-sm">SHA256</span>
               <div type="text" class="form-control input-text" aria-label="Sizing example input"
                 aria-describedby="inputGroup-sizing-sm">
                 <p>{{ cryptojs.SHA256(fakeText).toString() }}</p>
@@ -110,16 +123,16 @@ export default {
               <span class="input-group-text span d-flex justify-content-center d-flex justify-content-center"
                 id="inputGroup-sizing-sm decrypt" :class="{ 'ff': classDecrypt }">AES
                 Decrypt</span>
-              <div type="text" class="form-control input-text decrypt-div " :class="{ 'decrypt-block': classDecrypt }"
+              <div type="text" class="form-control  input-text decrypt-div " :class="{ 'decrypt-block': classDecrypt }"
                 aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm" v-html="decryptedText" readonly>
               </div>
             </div>
             <div class="element"></div>
           </div>
         </div>
-        <button type="submit" href="#" class="btn btn-primary mx-3" id="button-encrypt"
-          @click="changeClass()">Send</button>
-        <button type="button" class="btn btn-secondary" id="button-decrypt" @click="decryptMessage()">Decrypt</button>
+        <button type="submit" href="#" class="btn btn-primary mx-3" id="button-encrypt" @click="changeClass()"
+          :disabled="!show">Send</button>
+        <button type=" button" class="btn btn-secondary" id="button-decrypt" @click="decryptMessage()">Decrypt</button>
       </div>
     </div>
   </div>
@@ -132,6 +145,10 @@ export default {
   display: none !important;
 }
 
+.psw {
+  pointer-events: none;
+
+}
 
 
 #button-decrypt {

@@ -1,0 +1,44 @@
+.xx {
+    color: blue !important;
+    border-color: blue !important;
+}
+
+.card {
+    padding: 0px;
+}
+
+.card-header {
+    background-image: url('../public/blurry-gradient-haikei.png');
+    background-size: cover;
+    color: white;
+    font-weight: 600;
+}
+
+.span {
+    background-image: url('../public/blurry-gradient-haikei.png');
+    color: white;
+    font-weight: 600;
+    width: 100px;
+    height: 70px;
+    border-radius: 4px 4px 1px 1px !important;
+}
+
+.input-text {
+    font-weight: 600;
+    border-radius: 0px !important;
+
+}
+
+.ff {
+    background-image: url('../public/blu.png') !important;
+
+}
+
+.decrypt-div {
+    display: none !important
+}
+
+.decrypt-block {
+    display: block !important;
+    text-align: start;
+}
